@@ -1,3 +1,3 @@
 module github.com/LXY1226/ltfswriter
 
-go 1.24
+go 1.24.0

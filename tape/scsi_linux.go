@@ -2,20 +2,25 @@ package tape
 
 import (
 	"log"
+	"os"
 	"syscall"
 	"unsafe"
 )
 
 type Drive struct {
+	*os.File
 	fd uintptr
 }
 
 func Open(path string) (*Drive, error) {
-	fd, err := syscall.Open(path, syscall.O_RDWR|syscall.O_CLOEXEC, 0)
+	f, err := os.OpenFile(path, syscall.O_RDWR|syscall.O_CLOEXEC, 0)
 	if err != nil {
 		return nil, err
 	}
-	return &Drive{fd: uintptr(fd)}, nil
+	return &Drive{
+		File: f,
+		fd:   f.Fd(),
+	}, nil
 }
 
 //typedef struct sg_io_hdr {
@@ -123,8 +128,12 @@ func scsi(fd uintptr, hdr *sgioHdr) error {
 	return err
 }
 
-func sgIO(fd uintptr, arg *sgioHdr) (err error) {
-	_, _, e1 := syscall.Syscall(syscall.SYS_IOCTL, fd, 0x2285, uintptr(unsafe.Pointer(arg))) // SG_IO
+func sgIO(fd uintptr, arg *sgioHdr) error {
+	return ioctl(fd, 0x2285, uintptr(unsafe.Pointer(arg)))
+}
+
+func ioctl(fd, cmd, arg uintptr) (err error) {
+	_, _, e1 := syscall.Syscall(syscall.SYS_IOCTL, fd, cmd, arg)
 	if e1 != 0 {
 		err = errnoErr(e1)
 	}

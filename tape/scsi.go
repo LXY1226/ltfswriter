@@ -122,6 +122,8 @@ const (
 	Locate16FlagWithPart   = 0b00_000_010
 )
 
+//func (d Drive) ReadBlockLimits()
+
 func (d Drive) Locate16(flag byte, part byte, logicalID uint64) error {
 	err := d.scsiCmd([]byte{
 		ScsiOpLocate16, flag, 0, part,
@@ -165,6 +167,7 @@ func (d Drive) ReadPosition() (PositionData, error) {
 		File:      binary.BigEndian.Uint64(dat[16:]),
 	}, nil
 }
+
 func dumpHex(dat []byte) {
 	hex.Dumper(os.Stdout).Write(dat)
 	os.Stdout.WriteString("\n")
