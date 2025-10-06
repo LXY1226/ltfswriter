@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	util "github.com/LXY1226/ltfswriter/debug_util"
 	"log"
-	"os"
 )
 
 const senseBufferSize = 32
@@ -87,7 +87,7 @@ func (d Drive) DumpCapacity() {
 	if err != nil {
 		panic(err)
 	}
-	dumpHex(dat)
+	util.DumpHex(dat)
 
 	/*CurrentCumulativeValues*/
 	//0b01_000000 |
@@ -134,7 +134,7 @@ func (d Drive) Locate16(flag byte, part byte, logicalID uint64) error {
 	return err
 }
 
-func (d Drive) Read() ([]byte, error) {
+func (d Drive) scsiReadData() ([]byte, error) {
 	return d.scsiRead([]byte{
 		ScsiOpRead, 0b0000_0010, 0, 4, 00, 0,
 	}, 256*1024, 600_000)
@@ -160,15 +160,10 @@ func (d Drive) ReadPosition() (PositionData, error) {
 	if dat[0]&0x80 == 0x80 {
 		return PositionData{Partition: binary.BigEndian.Uint32(dat[4:])}, nil
 	}
-	dumpHex(dat)
+	util.DumpHex(dat)
 	return PositionData{
 		Partition: binary.BigEndian.Uint32(dat[4:]),
 		Block:     binary.BigEndian.Uint64(dat[8:]),
 		File:      binary.BigEndian.Uint64(dat[16:]),
 	}, nil
-}
-
-func dumpHex(dat []byte) {
-	hex.Dumper(os.Stdout).Write(dat)
-	os.Stdout.WriteString("\n")
 }

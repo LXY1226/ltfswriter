@@ -7,7 +7,7 @@ func (d Drive) WriteTo(wr *os.File) error {
 	var scsiError error
 	go func() {
 		for {
-			b, err := d.Read()
+			b, err := d.scsiReadData()
 			if err != nil {
 				scsiError = err
 				close(ch)

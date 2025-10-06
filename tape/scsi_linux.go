@@ -7,11 +7,6 @@ import (
 	"unsafe"
 )
 
-type Drive struct {
-	*os.File
-	fd uintptr
-}
-
 func Open(path string) (*Drive, error) {
 	f, err := os.OpenFile(path, syscall.O_RDWR|syscall.O_CLOEXEC, 0)
 	if err != nil {

@@ -1,12 +1,11 @@
 package main
 
 import (
-	"io"
+	"encoding/hex"
+	"github.com/LXY1226/ltfswriter/ltfs"
+	"github.com/LXY1226/ltfswriter/tape"
 	"log"
 	"os"
-	"time"
-
-	"github.com/LXY1226/ltfswriter/tape"
 )
 
 func main() {
@@ -27,40 +26,41 @@ func main() {
 	//	panic(err)
 	//}
 
-	err = drive.MTSeek(0)
-	if err != nil {
-		panic(err)
-	}
-	err = drive.MTSwitchPart(1)
-	if err != nil {
-		panic(err)
-	}
 	//err = drive.MTSetBlock(0)
 	//if err != nil {
 	//	panic(err)
 	//}
-	buf := make([]byte, 8<<20)
-	for range 100 {
-		start := time.Now()
-		n, err := drive.File.Read(buf)
-		end := time.Now()
-		log.Println(n, "of", cap(buf), "read in", end.Sub(start))
-		//if n != 0 {
-		//	if n > 128 {
-		//		hex.Dumper(os.Stdout).Write(buf[:128])
-		//	} else {
-		//		hex.Dumper(os.Stdout).Write(buf[:n])
-		//	}
-		//	os.Stdout.WriteString("\n")
-		//}
-		if err != nil {
-			log.Println(err)
-			if err == io.EOF {
-				// TODO check status EOF?EOM
-				continue
-			}
-		}
-	}
+	vol, err := ltfs.Open(drive)
+	log.Println(err)
+	//if err != nil {
+	//	panic(err)
+	//}
+	log.Println(vol.Vol1Label.String())
+	log.Println(vol.LatestIndex.GenerationNumber)
+	log.Println(vol.LatestIndex.Directory.Name)
+
+	//buf := make([]byte, 8<<20)
+	//for range 100 {
+	//	start := time.Now()
+	//	n, err := io.ReadFull(drive.File, buf)
+	//	end := time.Now()
+	//	log.Println(n, "of", cap(buf), "read in", end.Sub(start))
+	//	//if n != 0 {
+	//	//	if n > 128 {
+	//	//		hex.Dumper(os.Stdout).Write(buf[:128])
+	//	//	} else {
+	//	//		hex.Dumper(os.Stdout).Write(buf[:n])
+	//	//	}
+	//	//	os.Stdout.WriteString("\n")
+	//	//}
+	//	if err != nil {
+	//		log.Println(err)
+	//		if err == io.EOF {
+	//			// TODO check status EOF?EOM
+	//			continue
+	//		}
+	//	}
+	//}
 	//drive.CheckParts()
 	//drive.DumpCapacity()
 	//drive.Locate10PartBlock(tape.Locate10FlagWithPart, 1, 1)
@@ -78,4 +78,9 @@ func main() {
 	//	}
 	//	f.Close()
 	//}
+}
+
+func dumpHex(dat []byte) {
+	hex.Dumper(os.Stdout).Write(dat)
+	os.Stdout.WriteString("\n")
 }
