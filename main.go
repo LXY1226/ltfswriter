@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/hex"
-	"github.com/LXY1226/ltfswriter/ltfs"
-	"github.com/LXY1226/ltfswriter/tape"
 	"log"
 	"os"
+
+	"github.com/LXY1226/ltfswriter/ltfs"
+	"github.com/LXY1226/ltfswriter/tape"
 )
 
 func main() {

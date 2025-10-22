@@ -8,7 +8,7 @@ import (
 )
 
 func Open(path string) (*Drive, error) {
-	f, err := os.OpenFile(path, syscall.O_RDWR|syscall.O_CLOEXEC, 0)
+	f, err := os.OpenFile(path, syscall.O_RDONLY|syscall.O_CLOEXEC, 0)
 	if err != nil {
 		return nil, err
 	}
